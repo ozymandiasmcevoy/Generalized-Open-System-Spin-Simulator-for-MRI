@@ -216,3 +216,12 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Project-generated outputs
+outputs/
+temp_outputs/
+generated_outputs/
+
+# Local data and temporary files
+*.tmp
+.DS_Store
