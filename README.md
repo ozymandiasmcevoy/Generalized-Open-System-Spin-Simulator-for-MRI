@@ -23,29 +23,29 @@ spin phase-space representations.
 
 The closed-system dynamics follow the Liouville–von Neumann equation,
 
-\[
+```math
 \frac{d\rho}{dt}
 =
--\frac{i}{\hbar}[H,\rho],
-\]
+-\frac{i}{\hbar}[H,\rho]
+```
 
 while relaxation and dephasing are modeled using Lindblad dissipators,
 
-\[
+```math
 \frac{d\rho}{dt}
 =
 -\frac{i}{\hbar}[H,\rho]
 +
 \sum_k
 \left(
-L_k\rho L_k^\dagger
+L_k \rho L_k^\dagger
 -
 \frac{1}{2}
 \left\{
 L_k^\dagger L_k,\rho
 \right\}
-\right).
-\]
+\right)
+```
 
 ## Development Status
 
