@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Open-System MRI Spin Simulations</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 40px 20px;
+            background: #003366;
+            color: #FFFFFF;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #FFCC00;
+            margin-bottom: 8px;
+        }
+
+        h2 {
+            color: #FFCC00;
+        }
+
+        .subtitle {
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+
+        .simulation-card {
+            display: block;
+            margin: 16px 0;
+            padding: 20px;
+            border: 1px solid #FFCC00;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.15);
+            color: #FFFFFF;
+            text-decoration: none;
+        }
+
+        .simulation-card:hover {
+            background: rgba(255, 204, 0, 0.12);
+        }
+
+        .simulation-card strong {
+            display: block;
+            margin-bottom: 8px;
+            color: #39FF14;
+            font-size: 1.1rem;
+        }
+
+        footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #FFCC00;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <h1>Generalized Open-System Spin Simulator for MRI</h1>
+
+        <p class="subtitle">
+            Interactive density-matrix simulations of MRI spin dynamics
+            using Liouville–von Neumann and Lindblad master equations.
+        </p>
+
+        <h2>Interactive Simulations</h2>
+
+        <a class="simulation-card" href="01_unitary_zeeman_precession.html">
+            <strong>1. Unitary Zeeman Precession</strong>
+            Nonrelaxing spin-1/2 evolution under the Zeeman Hamiltonian.
+        </a>
+
+        <a class="simulation-card" href="02_single_pulse_t2_dephasing.html">
+            <strong>2. Single-Pulse T2 Dephasing</strong>
+            Transverse dephasing following RF excitation using Lindblad dynamics.
+        </a>
+
+        <a class="simulation-card" href="03_repeated_pulse_t1_steady_state.html">
+            <strong>3. Repeated-Pulse T1 Steady State</strong>
+            Repeated excitation and longitudinal recovery toward a steady state.
+        </a>
+
+        <a class="simulation-card" href="04_wigner_husimi_phase_space.html">
+            <strong>4. Wigner and Husimi-Q Phase Space</strong>
+            Spin phase-space representations of the open-system dynamics.
+        </a>
+
+        <footer>
+            Ozymandias McEvoy · Python · NumPy · SciPy · Plotly
+        </footer>
+    </main>
+</body>
+</html>
