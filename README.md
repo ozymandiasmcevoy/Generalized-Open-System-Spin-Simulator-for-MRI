@@ -17,7 +17,7 @@ spin phase-space representations.
 1. Unitary, nonrelaxing Zeeman precession
 2. Single-excitation T2 dephasing through Lindblad dynamics
 3. Repeated RF excitations with T1 relaxation toward a steady state
-4. Wigner and Husimi-Q phase-space representations of the repeated-pulse dynamics
+4. Wigner and Husimi-Q phase-space representations of the single-pulse dynamics
 
 ## Methods
 
