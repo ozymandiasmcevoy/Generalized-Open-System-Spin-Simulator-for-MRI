@@ -1,7 +1,9 @@
 # Generalized Open-System Spin Simulator for MRI
-
 A density-matrix framework for simulating MRI spin dynamics using
 Liouville–von Neumann and Lindblad master equations.
+
+[**Launch Premade Interactive Simulations →**](https://ozymandiasmcevoy.github.io/Generalized-Open-System-Spin-Simulator-for-MRI/)
+
 
 ## Overview
 
