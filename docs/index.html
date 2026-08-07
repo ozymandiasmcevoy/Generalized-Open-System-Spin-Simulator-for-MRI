@@ -3,101 +3,378 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <meta name="description" content="Interactive open-system density-matrix simulations of MRI spin dynamics.">
     <title>Open-System MRI Spin Simulations</title>
 
     <style>
-        body {
-            margin: 0;
-            padding: 40px 20px;
-            background: #003366;
-            color: #FFFFFF;
-            font-family: Arial, Helvetica, sans-serif;
+        :root {
+            --background: #06182b;
+            --panel: #0b2238;
+            --gold: #ffcc00;
+            --green: #39ff14;
+            --white: #f5f7fa;
+            --muted: #9eafbf;
+            --line: #27445e;
         }
 
-        main {
-            max-width: 900px;
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            min-height: 100%;
+            background: var(--background);
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            color: var(--white);
+            background:
+                linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px),
+                var(--background);
+            background-size: 48px 48px;
+            font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+        }
+
+        .page-shell {
+            width: min(1120px, calc(100% - 48px));
             margin: 0 auto;
+            padding: 64px 0 40px;
+        }
+
+        .project-header {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 48px;
+            align-items: end;
+            padding-bottom: 32px;
+            border-bottom: 1px solid var(--gold);
+        }
+
+        .eyebrow {
+            margin: 0 0 16px;
+            color: var(--green);
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.78rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
         }
 
         h1 {
-            color: #FFCC00;
-            margin-bottom: 8px;
-        }
-
-        h2 {
-            color: #FFCC00;
+            max-width: 760px;
+            margin: 0;
+            color: var(--gold);
+            font-size: clamp(2.4rem, 6vw, 5.3rem);
+            font-weight: 650;
+            letter-spacing: -0.055em;
+            line-height: 0.95;
         }
 
         .subtitle {
-            line-height: 1.6;
-            margin-bottom: 32px;
+            max-width: 720px;
+            margin: 24px 0 0;
+            color: var(--muted);
+            font-size: 1.05rem;
+            line-height: 1.7;
         }
 
-        .simulation-card {
+        .project-status {
+            min-width: 180px;
+            padding-left: 20px;
+            border-left: 1px solid var(--line);
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.75rem;
+            line-height: 1.9;
+            text-transform: uppercase;
+        }
+
+        .status-label {
             display: block;
-            margin: 16px 0;
-            padding: 20px;
-            border: 1px solid #FFCC00;
-            border-radius: 8px;
-            background: rgba(0, 0, 0, 0.15);
-            color: #FFFFFF;
+            color: var(--muted);
+        }
+
+        .status-value {
+            color: var(--white);
+        }
+
+        .status-value::before {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            margin-right: 8px;
+            border-radius: 50%;
+            background: var(--green);
+            content: "";
+        }
+
+        .simulation-index {
+            margin-top: 56px;
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 24px;
+            margin-bottom: 14px;
+            font-family: Consolas, "Courier New", monospace;
+        }
+
+        .section-heading h2 {
+            margin: 0;
+            color: var(--white);
+            font-size: 0.8rem;
+            font-weight: 400;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        .section-heading span {
+            color: var(--muted);
+            font-size: 0.72rem;
+        }
+
+        .simulation-list {
+            border-top: 1px solid var(--line);
+        }
+
+        .simulation-link {
+            position: relative;
+            display: grid;
+            grid-template-columns: 64px minmax(0, 1fr) 34px;
+            gap: 22px;
+            align-items: center;
+            min-height: 118px;
+            padding: 22px 14px 22px 0;
+            border-bottom: 1px solid var(--line);
+            color: inherit;
             text-decoration: none;
+            transition: background 150ms ease, padding-left 150ms ease;
         }
 
-        .simulation-card:hover {
-            background: rgba(255, 204, 0, 0.12);
+        .simulation-link::before {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            width: 3px;
+            background: var(--green);
+            content: "";
+            transform: scaleY(0);
+            transform-origin: center;
+            transition: transform 150ms ease;
         }
 
-        .simulation-card strong {
+        .simulation-link:hover,
+        .simulation-link:focus-visible {
+            padding-left: 14px;
+            background: rgba(18,59,93,0.58);
+            outline: none;
+        }
+
+        .simulation-link:hover::before,
+        .simulation-link:focus-visible::before {
+            transform: scaleY(1);
+        }
+
+        .module-number {
+            color: var(--gold);
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.78rem;
+            letter-spacing: 0.1em;
+        }
+
+        .module-title {
             display: block;
             margin-bottom: 8px;
-            color: #39FF14;
-            font-size: 1.1rem;
+            color: var(--white);
+            font-size: clamp(1.12rem, 2vw, 1.4rem);
+            font-weight: 600;
+            letter-spacing: -0.015em;
+        }
+
+        .module-description {
+            display: block;
+            max-width: 720px;
+            color: var(--muted);
+            font-size: 0.93rem;
+            line-height: 1.55;
+        }
+
+        .launch-arrow {
+            color: var(--green);
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 1.25rem;
+            text-align: right;
+            transition: transform 150ms ease;
+        }
+
+        .simulation-link:hover .launch-arrow,
+        .simulation-link:focus-visible .launch-arrow {
+            transform: translateX(5px);
         }
 
         footer {
-            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+            gap: 24px;
+            margin-top: 56px;
             padding-top: 20px;
-            border-top: 1px solid #FFCC00;
-            font-size: 0.9rem;
+            border-top: 1px solid var(--gold);
+            color: var(--muted);
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.72rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        footer a {
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: var(--green);
+        }
+
+        @media (max-width: 720px) {
+            .page-shell {
+                width: min(100% - 30px, 1120px);
+                padding-top: 36px;
+            }
+
+            .project-header {
+                grid-template-columns: 1fr;
+                gap: 28px;
+            }
+
+            .project-status {
+                padding: 16px 0 0;
+                border-top: 1px solid var(--line);
+                border-left: 0;
+            }
+
+            .simulation-link {
+                grid-template-columns: 42px minmax(0, 1fr) 20px;
+                gap: 12px;
+                min-height: 132px;
+            }
+
+            .section-heading span {
+                display: none;
+            }
+
+            footer {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 
 <body>
-    <main>
-        <h1>Generalized Open-System Spin Simulator for MRI</h1>
+    <main class="page-shell">
+        <header class="project-header">
+            <div>
+                <p class="eyebrow">Density Matrix Laboratory / MRI</p>
 
-        <p class="subtitle">
-            Interactive density-matrix simulations of MRI spin dynamics
-            using Liouville–von Neumann and Lindblad master equations.
-        </p>
+                <h1>Open-System Spin Simulations</h1>
 
-        <h2>Interactive Simulations</h2>
+                <p class="subtitle">
+                    Interactive computational experiments connecting spin-1/2
+                    density matrices, Lindblad open-system dynamics, and
+                    voxel-scale MRI magnetization.
+                </p>
+            </div>
 
-        <a class="simulation-card" href="01_unitary_zeeman_precession.html">
-            <strong>1. Unitary Zeeman Precession</strong>
-            Nonrelaxing spin-1/2 evolution under the Zeeman Hamiltonian.
-        </a>
+            <aside class="project-status" aria-label="Project information">
+                <span class="status-label">Formalism</span>
+                <span class="status-value">Density Matrix</span>
 
-        <a class="simulation-card" href="02_single_pulse_t2_dephasing.html">
-            <strong>2. Single-Pulse T2 Dephasing</strong>
-            Transverse dephasing following RF excitation using Lindblad dynamics.
-        </a>
+                <span class="status-label">Dynamics</span>
+                <span>Liouville / Lindblad</span>
 
-        <a class="simulation-card" href="03_repeated_pulse_t1_steady_state.html">
-            <strong>3. Repeated-Pulse T1 Steady State</strong>
-            Repeated excitation and longitudinal recovery toward a steady state.
-        </a>
+                <span class="status-label">Field Strengths</span>
+                <span>3T / 7T / 9.4T</span>
+            </aside>
+        </header>
 
-        <a class="simulation-card" href="04_wigner_husimi_phase_space.html">
-            <strong>4. Wigner and Husimi-Q Phase Space</strong>
-            Spin phase-space representations of the open-system dynamics.
-        </a>
+        <section class="simulation-index" aria-labelledby="simulation-heading">
+            <div class="section-heading">
+                <h2 id="simulation-heading">Simulation Index</h2>
+                <span>Select a module to launch</span>
+            </div>
+
+            <nav class="simulation-list" aria-label="Interactive simulations">
+                <a class="simulation-link" href="01_unitary_zeeman_precession.html">
+                    <span class="module-number">01</span>
+                    <span>
+                        <strong class="module-title">Unitary Zeeman Precession</strong>
+                        <span class="module-description">
+                            Nonrelaxing spin-1/2 evolution under the Zeeman
+                            Hamiltonian with Larmor-frequency analysis.
+                        </span>
+                    </span>
+                    <span class="launch-arrow" aria-hidden="true">→</span>
+                </a>
+
+                <a class="simulation-link" href="02_single_pulse_t2_dephasing.html">
+                    <span class="module-number">02</span>
+                    <span>
+                        <strong class="module-title">Single-Pulse T2 Dephasing</strong>
+                        <span class="module-description">
+                            Transverse dephasing and longitudinal relaxation
+                            following a single RF excitation.
+                        </span>
+                    </span>
+                    <span class="launch-arrow" aria-hidden="true">→</span>
+                </a>
+
+                <a class="simulation-link" href="03_repeated_pulse_t1_steady_state.html">
+                    <span class="module-number">03</span>
+                    <span>
+                        <strong class="module-title">Repeated-Pulse T1 Steady State</strong>
+                        <span class="module-description">
+                            Repeated excitation, incomplete longitudinal
+                            recovery, saturation, and driven steady-state behavior.
+                        </span>
+                    </span>
+                    <span class="launch-arrow" aria-hidden="true">→</span>
+                </a>
+
+                <a class="simulation-link" href="04_wigner_husimi_phase_space.html">
+                    <span class="module-number">04</span>
+                    <span>
+                        <strong class="module-title">Wigner and Husimi-Q Phase Space</strong>
+                        <span class="module-description">
+                            Spherical phase-space representations of evolving
+                            open-system spin density matrices.
+                        </span>
+                    </span>
+                    <span class="launch-arrow" aria-hidden="true">→</span>
+                </a>
+
+                <a class="simulation-link" href="05_hahn_echo_rephasing.html">
+                    <span class="module-number">05</span>
+                    <span>
+                        <strong class="module-title">Hahn Spin-Echo Rephasing</strong>
+                        <span class="module-description">
+                            Reversible off-resonance dephasing and 180-degree
+                            refocusing across a Gaussian isochromat ensemble.
+                        </span>
+                    </span>
+                    <span class="launch-arrow" aria-hidden="true">→</span>
+                </a>
+            </nav>
+        </section>
 
         <footer>
-            Ozymandias McEvoy · Python · NumPy · SciPy · Plotly
+            <span>Ozymandias McEvoy</span>
+            <span>Python / NumPy / SciPy / Plotly</span>
+            <a href="https://github.com/ozymandiasmcevoy/Generalized-Open-System-Spin-Simulator-for-MRI">
+                Source Repository
+            </a>
         </footer>
     </main>
 </body>
