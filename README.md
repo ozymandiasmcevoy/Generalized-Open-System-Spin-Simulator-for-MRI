@@ -20,6 +20,7 @@ The framework supports:
 - configurable static field strengths;
 - single-pulse and repeated-pulse experiments;
 - longitudinal recovery and transverse dephasing;
+- static off-resonance distributions and Hahn spin-echo refocusing;
 - driven steady-state behavior;
 - Wigner and Husimi-Q spin phase-space representations;
 - interactive Plotly animations exported as standalone HTML files.
@@ -41,6 +42,10 @@ The framework supports:
 4. **Wigner and Husimi-Q Phase-Space Dynamics**
 
    Maps the evolving spin-1/2 density matrix onto spherical Wigner and Husimi-Q representations, providing complementary phase-space views of the same open-system evolution.
+
+5. **Hahn Spin-Echo Rephasing**
+
+   Represents static field inhomogeneity through a Gaussian distribution of off-resonance isochromats. The simulation compares uninterrupted transverse dephasing with a Hahn spin-echo sequence consisting of a 90-degree excitation and a 180-degree refocusing pulse at TE/2. The resulting echo recovers the reversible off-resonance dephasing at TE while retaining irreversible T2 attenuation.
 
 ## Physical Model
 
@@ -132,7 +137,7 @@ with
 U_x(\alpha)\rho^{-}U_x^\dagger(\alpha).
 ```
 
-The default flip angle is the tissue- and repetition-time-dependent Ernst angle:
+The repeated-pulse simulations default to the tissue- and repetition-time-dependent Ernst angle:
 
 ```math
 \alpha_E
@@ -141,6 +146,8 @@ The default flip angle is the tissue- and repetition-time-dependent Ernst angle:
 e^{-TR/T_1}
 \right).
 ```
+
+The Hahn spin-echo simulation instead uses a 90-degree excitation followed by a 180-degree refocusing pulse at TE/2.
 
 ## Open-System Dynamics
 
@@ -337,6 +344,7 @@ Hamiltonian_Bloch_Precession_Simulator.html
 Lindbladian_Bloch_T2_Simulator.html
 Lindbladian_Bloch_T1_Steady_State_Simulator.html
 Lindbladian_Wigner_Husimi_T2_Simulator.html
+Hahn_Echo_Rephasing.html
 ```
 
 The HTML files can be opened locally in a browser or hosted through GitHub Pages.
@@ -348,7 +356,7 @@ The resulting interactive HTML file will be written to the current working direc
 The current simulations make several simplifying assumptions:
 
 - hydrogen nuclei are represented as noninteracting spin-1/2 systems;
-- the static field is spatially uniform;
+- the static field is spatially uniform, with the Hahn spin-echo simulation introducing a prescribed Gaussian distribution of static off-resonance frequencies;
 - RF pulses are ideal and instantaneous;
 - tissue properties are spatially homogeneous within each voxel;
 - diffusion, chemical shift, tissue-susceptibility, exchange, and spin-spin coupling are not included;
