@@ -19,33 +19,39 @@ The framework supports:
 - tissue-dependent proton density, T1, and T2;
 - configurable static field strengths;
 - single-pulse and repeated-pulse experiments;
+- Wigner and Husimi-Q spin phase-space representations;
 - longitudinal recovery and transverse dephasing;
 - static off-resonance distributions and Hahn spin-echo refocusing;
 - driven steady-state behavior;
-- Wigner and Husimi-Q spin phase-space representations;
+- two-pulse and stimulated-echo coherence pathways;
 - interactive Plotly animations exported as standalone HTML files.
+
 
 ## Current Simulations
 
-1. **Hamiltonian Bloch Precession**
+1. **Unitary Zeeman Precession**
 
    Simulates nonrelaxing laboratory-frame proton-spin precession following a single RF excitation. The accompanying Fourier-transform panel identifies the Larmor-frequency content of the spin expectation values.
 
-2. **Lindbladian T2 Relaxation**
+2. **Single-Pulse T2 Dephasing**
 
    Simulates a single excitation followed by transverse dephasing and longitudinal relaxation. The animation displays the decaying transverse voxel magnetization over several multiples of the selected tissue's T2.
 
-3. **Repeated-Pulse T1 and Steady-State Dynamics**
-
-   Applies a sequence of fixed-flip-angle RF rotations separated by configurable repetition times. The simulation demonstrates incomplete longitudinal recovery, progressive saturation, and convergence toward a flip-angle-dependent driven steady state.
-
-4. **Wigner and Husimi-Q Phase-Space Dynamics**
+3. **Wigner and Husimi-Q Phase-Space**
 
    Maps the evolving spin-1/2 density matrix onto spherical Wigner and Husimi-Q representations, providing complementary phase-space views of the same open-system evolution.
+
+4. **Repeated-Pulse T1 Steady-State**
+
+   Applies a sequence of fixed-flip-angle RF rotations separated by configurable repetition times. The simulation demonstrates incomplete longitudinal recovery, progressive saturation, and convergence toward a flip-angle-dependent driven steady state.
 
 5. **Hahn Spin-Echo Rephasing**
 
    Represents static field inhomogeneity through a Gaussian distribution of off-resonance isochromats. The simulation compares uninterrupted transverse dephasing with a Hahn spin-echo sequence consisting of a 90-degree excitation and a 180-degree refocusing pulse at TE/2. The resulting echo recovers the reversible off-resonance dephasing at TE while retaining irreversible T2 attenuation.
+
+6. **Stimulated-Echo Coherence Pathways**
+   
+   Compares a two-pulse echo pathway with a three-pulse stimulated-echo sequence across an off-resonance isochromat ensemble. The simulation visualizes transverse dephasing, longitudinal coherence storage, RF recall, and echo rephasing while retaining irreversible Lindblad relaxation.
 
 ## Physical Model
 
@@ -147,7 +153,7 @@ e^{-TR/T_1}
 \right).
 ```
 
-The Hahn spin-echo simulation instead uses a 90-degree excitation followed by a 180-degree refocusing pulse at TE/2.
+The Hahn spin-echo simulation instead uses a 90-degree excitation followed by a 180-degree refocusing pulse at TE/2. The stimulated-echo simulation uses three 90-degree pulses, with the interval between the second and third pulses providing longitudinal coherence storage before RF recall and subsequent rephasing.
 
 ## Open-System Dynamics
 
@@ -340,11 +346,12 @@ Each script produces a standalone Plotly HTML simulation with play, pause, frame
 The generated simulations include:
 
 ```text
-Hamiltonian_Bloch_Precession_Simulator.html
-Lindbladian_Bloch_T2_Simulator.html
-Lindbladian_Bloch_T1_Steady_State_Simulator.html
-Lindbladian_Wigner_Husimi_T2_Simulator.html
-Hahn_Echo_Rephasing.html
+unitary_zeeman_precession.html
+single_pulse_t2_dephasing.html
+wigner_husimi_phase_space.html
+repeated_pulse_t1_steady_state.html
+hahn_echo_rephasing.html
+stimulated_echo_coherence_pathways.html
 ```
 
 The HTML files can be opened locally in a browser or hosted through GitHub Pages.
@@ -356,12 +363,13 @@ The resulting interactive HTML file will be written to the current working direc
 The current simulations make several simplifying assumptions:
 
 - hydrogen nuclei are represented as noninteracting spin-1/2 systems;
-- the static field is spatially uniform, with the Hahn spin-echo simulation introducing a prescribed Gaussian distribution of static off-resonance frequencies;
+- the static field is spatially uniform except in the Hahn and stimulated-echo simulations, which introduce a Gaussian distribution of off-resonance frequencies;
 - RF pulses are ideal and instantaneous;
 - tissue properties are spatially homogeneous within each voxel;
 - diffusion, chemical shift, tissue-susceptibility, exchange, and spin-spin coupling are not included;
 - relaxation is represented through idealized Markovian Lindblad channels;
-- tissue parameters are representative values rather than a strong experimental parameters.
+- tissue parameters are representative values rather than experiment-specific measurements.
+
 
 The simulations are intended as a transparent computational framework for connecting density-matrix dynamics, open-system quantum mechanics, and conventional MRI magnetization behavior.
 
