@@ -436,14 +436,12 @@ pulse2_pre_idx = repeatsum+num_pre_frames-1
 pulse2_post_idx = pulse2_pre_idx+1
 pulse3_pre_idx = repeatsum+num_pre_frames+pulse3_index
 pulse3_post_idx = pulse3_pre_idx+1
-no3_echo_time = 2.0*time_for_pulse2
-no3_echo_idx = np.argmin(np.abs(animation_time-no3_echo_time))
 stim_echo_time = actual_pulse3_time+time_for_pulse2
 stim_echo_idx = pulse3_post_idx+np.argmin(np.abs(t_post3-stim_echo_time))
 
 # Thin physical frames while retaining holds, pulse states, stimulated echo, and final state
 plot_stride = 5
-plot_indices = np.concatenate((np.arange(repeatsum),np.arange(repeatsum,num_total_frames,plot_stride),[pulse2_pre_idx,pulse2_post_idx,pulse3_pre_idx,pulse3_post_idx,no3_echo_idx,stim_echo_idx,num_total_frames-1]))
+plot_indices = np.concatenate((np.arange(repeatsum),np.arange(repeatsum,num_total_frames,plot_stride),[pulse2_pre_idx,pulse2_post_idx,pulse3_pre_idx,pulse3_post_idx,stim_echo_idx,num_total_frames-1]))
 plot_indices = np.unique(plot_indices)
 
 # Thinned animation quantities
@@ -461,7 +459,7 @@ stim_Mxy_plot = stim_Mxy[plot_indices]
 
 # Effective phase-evolution times for the two selected coherence pathways
 def no3_effective_time(t):
-    return t if t <= time_for_pulse2 else 2.0*time_for_pulse2-t
+    return t if t <= time_for_pulse2 else time_for_pulse2
 
 def stim_effective_time(t):
     if t <= time_for_pulse2:
@@ -515,8 +513,9 @@ if axis_limit == 0:
     axis_limit = 1.0
 
 # Shared pathway-axis limits
-path_y_min = 1.10*min(np.min(no3_iso_path),np.min(stim_iso_path),0.0)
-path_y_max = 1.15*max(np.max(no3_iso_path),np.max(stim_iso_path),1.0)
+path_y_abs = 1.75*max(np.max(np.abs(no3_iso_path)),np.max(np.abs(stim_iso_path)),1.0)
+path_y_min = -path_y_abs
+path_y_max = path_y_abs
 
 # Construct transverse circle at the current longitudinal position
 def transverse_circle(mx,my,mz):
@@ -546,8 +545,6 @@ def get_frame_title(k):
     if raw_idx == pulse3_post_idx:
         return f"Third 90° applied only to stimulated-echo branch → t = {actual_pulse3_time:.4f} s"
 
-    if raw_idx == no3_echo_idx:
-        return f"Selected two-pulse pathway rephases → t = {no3_echo_time:.4f} s"
 
     if raw_idx == stim_echo_idx:
         return f"Stimulated echo → t = {stim_echo_time:.4f} s"
@@ -562,7 +559,7 @@ fig = make_subplots(
     column_widths=[0.46,0.54],
     horizontal_spacing=0.07,
     vertical_spacing=0.10,
-    subplot_titles=("Two-Pulse / No-Recall Precession","Two-Pulse Selected Pathway","Stimulated-Echo Precession","Stimulated-Echo Selected Pathway")
+    subplot_titles=("Two 90° Pulses / No Recall","Unrecalled Stored Pathway","Three 90° Pulses / Recall","Stimulated-Echo Pathway")
 )
 
 # Initial transverse circles
@@ -579,9 +576,9 @@ fig.add_trace(go.Scatter3d(x=[0.0,stim_Mx_plot[0]],y=[0.0,stim_My_plot[0]],z=[0.
 fig.add_trace(go.Scatter3d(x=stim_circle_initial[0],y=stim_circle_initial[1],z=stim_circle_initial[2],mode="lines",line=dict(color=stim_green,width=4),showlegend=False,hoverinfo="skip"),row=2,col=1)
 # Traces 4-5: branch-style legend keys; the actual paths are the rainbow strands below
 # Trace 4: no-third-pulse branch legend key
-fig.add_trace(go.Scatter(x=[None],y=[None],mode="markers",marker=dict(color=no3_red,size=8,symbol="circle"),name="No third pulse"),row=1,col=2)
+fig.add_trace(go.Scatter(x=[None],y=[None],mode="markers",marker=dict(color=no3_red,size=5,symbol="circle"),name="No third pulse"),row=1,col=2)
 # Trace 5: stimulated-echo branch legend key
-fig.add_trace(go.Scatter(x=[None],y=[None],mode="markers",marker=dict(color=stim_green,size=8,symbol="diamond"),name="Stimulated echo"),row=2,col=2)
+fig.add_trace(go.Scatter(x=[None],y=[None],mode="markers",marker=dict(color=stim_green,size=5,symbol="diamond"),name="Stimulated echo"),row=2,col=2)
 # Trace 6: second-pulse reference in the no-third-pulse panel
 fig.add_trace(go.Scatter(x=[time_for_pulse2,time_for_pulse2],y=[path_y_min,path_y_max],mode="lines",line=dict(color=text_white,width=2),name="Second 90° pulse",hoverinfo="skip"),row=1,col=2)
 # Trace 7: second-pulse reference in the stimulated-echo panel
@@ -589,8 +586,6 @@ fig.add_trace(go.Scatter(x=[time_for_pulse2,time_for_pulse2],y=[path_y_min,path_
 # Trace 8: third-pulse channel-switch reference
 fig.add_trace(go.Scatter(x=[actual_pulse3_time,actual_pulse3_time],y=[path_y_min,path_y_max],mode="lines",line=dict(color=current_magenta,width=2),name="Third 90° pulse",hoverinfo="skip"),row=2,col=2)
 # Traces 9-10: zero-phase/rephasing references
-fig.add_trace(go.Scatter(x=[0.0,simulation_end],y=[0.0,0.0],mode="lines",line=dict(color=axis_gold,width=2,dash="dash"),name="Zero phase / echo",hoverinfo="skip"),row=1,col=2)
-fig.add_trace(go.Scatter(x=[0.0,simulation_end],y=[0.0,0.0],mode="lines",line=dict(color=axis_gold,width=2,dash="dash"),name="Zero phase / echo",hoverinfo="skip",showlegend=False),row=2,col=2)
 # Traces 11-12: moving pathway points
 fig.add_trace(go.Scatter(x=np.full(num_display_iso,t_plot[0]),y=no3_iso_positions(t_plot[0]),mode="markers",marker=dict(color=rainbow_colors,size=7,line=dict(color=no3_red,width=2)),name="Current no-pulse isochromats",showlegend=False,hoverinfo="skip"),row=1,col=2)
 fig.add_trace(go.Scatter(x=np.full(num_display_iso,t_plot[0]),y=stim_iso_positions(t_plot[0]),mode="markers",marker=dict(color=rainbow_colors,size=7,symbol="diamond",line=dict(color=stim_green,width=2)),name="Current stimulated isochromats",showlegend=False,hoverinfo="skip"),row=2,col=2)
@@ -661,7 +656,7 @@ for k in tqdm(range(num_plot_frames),desc="Building Stimulated-echo animation",u
             go.Scatter3d(x=no3_frame_trail_x,y=no3_frame_trail_y,z=no3_frame_trail_z),
             go.Scatter3d(x=stim_frame_trail_x,y=stim_frame_trail_y,z=stim_frame_trail_z)
         ],
-        traces=[0,1,2,3,11,12,13,14],
+        traces=[0,1,2,3,9,10,11,12],
         layout=go.Layout(title=dict(text=get_frame_title(k)))
     ))
 
@@ -697,11 +692,11 @@ fig.update_layout(
     font=dict(color=text_white),
     scene=scene_style,
     scene2=scene_style,
-    xaxis=dict(title="Time (s)",color=axis_gold,linecolor=axis_gold,gridcolor=grid_white,zeroline=False,showline=True,mirror=True,range=[0.0,simulation_end]),
+    xaxis=dict(title=dict(text="Time (s)",standoff=5),color=axis_gold,linecolor=axis_gold,gridcolor=grid_white,zeroline=False,showline=True,mirror=True,range=[0.0,simulation_end]),
     yaxis=dict(title="Isochromat phase (rad)",color=axis_gold,linecolor=axis_gold,gridcolor=grid_white,zeroline=False,showline=True,mirror=True,range=[path_y_min,path_y_max]),
     xaxis2=dict(title="Time (s)",color=axis_gold,linecolor=axis_gold,gridcolor=grid_white,zeroline=False,showline=True,mirror=True,range=[0.0,simulation_end]),
     yaxis2=dict(title="Isochromat phase (rad)",color=axis_gold,linecolor=axis_gold,gridcolor=grid_white,zeroline=False,showline=True,mirror=True,range=[path_y_min,path_y_max]),
-    legend=dict(x=0.59,y=1,xanchor="left",yanchor="top",orientation="h",bgcolor="rgba(6,24,43,0.70)",bordercolor=axis_gold,borderwidth=1,font=dict(color=text_white,size=8),itemsizing="constant",itemwidth=30,tracegroupgap=0),
+    legend=dict(x=0.59,y=1,xanchor="left",yanchor="top",orientation="h",bgcolor="rgba(6,24,43,0.70)",bordercolor=axis_gold,borderwidth=1,font=dict(color=text_white,size=8),itemsizing="constant",itemwidth=35,tracegroupgap=0),
     updatemenus=[dict(type="buttons",direction="left",showactive=False,x=0.42,y=-0.15,xanchor="center",yanchor="top",bgcolor=panel_background,bordercolor=axis_gold,font=dict(color=text_white),buttons=[
         dict(label="▶ Play",method="animate",args=[None,{"fromcurrent": True,"mode": "immediate","frame": {"duration": frame_duration_ms,"redraw": True},"transition": {"duration": 0}}]),
         dict(label="❚❚ Pause",method="animate",args=[[None],{"mode": "immediate","frame": {"duration": 0,"redraw": False},"transition": {"duration": 0}}])
@@ -713,14 +708,13 @@ fig.update_annotations(font=dict(color=axis_gold,size=17))
 
 # Labels for the selected coherence-channel behaviors
 fig.add_annotation(x=0.45*time_for_pulse2,y=0.65*path_y_max,text="Transverse dephasing",showarrow=False,font=dict(color=text_white,size=11),xref="x",yref="y")
-fig.add_annotation(x=0.5*(time_for_pulse2+actual_pulse3_time),y=0.45*path_y_max,text="Rephasing",showarrow=False,font=dict(color=text_white,size=11),xref="x",yref="y")
-fig.add_annotation(x=no3_echo_time,y=0.0,text="Two-pulse echo",showarrow=True,arrowhead=2,ax=-48,ay=42,arrowcolor=axis_gold,font=dict(color=text_white,size=11),xref="x",yref="y")
+fig.add_annotation(x=0.5*(time_for_pulse2+simulation_end),y=0.65*path_y_max,text="Z storage — no third pulse to recall it",showarrow=False,font=dict(color=text_white,size=11),xref="x",yref="y")
 fig.add_annotation(x=0.45*time_for_pulse2,y=0.65*path_y_max,text="Transverse dephasing",showarrow=False,font=dict(color=text_white,size=11),xref="x2",yref="y2")
 fig.add_annotation(x=0.5*(time_for_pulse2+actual_pulse3_time),y=0.65*path_y_max,text="Z storage",showarrow=False,font=dict(color=text_white,size=11),xref="x2",yref="y2")
 fig.add_annotation(x=0.5*(actual_pulse3_time+stim_echo_time),y=0.45*path_y_max,text="Rephasing",showarrow=False,font=dict(color=text_white,size=11),xref="x2",yref="y2")
-fig.add_annotation(x=stim_echo_time,y=0.0,text="Stimulated echo",showarrow=True,arrowhead=2,ax=50,ay=-38,arrowcolor=axis_gold,font=dict(color=text_white,size=11),xref="x2",yref="y2")
+fig.add_annotation(x=stim_echo_time,y=0.0,text="Stimulated echo",showarrow=True,arrowhead=2,ax=30,ay=-38,arrowcolor=axis_gold,font=dict(color=text_white,size=11),xref="x2",yref="y2")
 fig.add_annotation(x=0.9*simulation_end,y=-0.85*path_y_max,text="9 representative off-resonance isochromats",showarrow=False,xanchor="right",font=dict(color=axis_gold,size=9),xref="x",yref="y")
-fig.add_annotation(x=0.9*simulation_end,y=-0.85*path_y_max,text="9 representative off-resonance isochromats",showarrow=False,xanchor="right",font=dict(color=axis_gold,size=9),xref="x2",yref="y2")
+fig.add_annotation(x=0.98*simulation_end,y=-0.85*path_y_max,text="9 representative off-resonance isochromats",showarrow=False,xanchor="right",font=dict(color=axis_gold,size=9),xref="x2",yref="y2")
 
 
 # Gold borders around both Bloch panels
